@@ -15,7 +15,7 @@ if __name__ == "__main__":
         in_ida = False
     #
     if (in_ida):
-        trace_path = idc.AskStr("ins-jni2.txt", "trace path")
+        trace_path = idc.AskStr("trace-jni.txt", "trace path")
         if (not os.path.isabs(trace_path)):
             script_path = os.path.split(os.path.realpath(__file__))[0]
             trace_path = "%s/%s"%(script_path, trace_path)
