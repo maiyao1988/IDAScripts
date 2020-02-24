@@ -14,8 +14,10 @@ if __name__ == "__main__":
         print("not run in ida python skip comment...")
         in_ida = False
     #
+    is_clean=0
     if (in_ida):
         trace_path = idc.AskStr("trace-jni.txt", "trace path")
+        is_clean = idc.AskLong(0, "clean path?")
         if (not os.path.isabs(trace_path)):
             script_path = os.path.split(os.path.realpath(__file__))[0]
             trace_path = "%s/%s"%(script_path, trace_path)
@@ -52,18 +54,22 @@ if __name__ == "__main__":
     print(dic_call)
     if (in_ida):
         for addr in dic_call:
+            comm = ""
+            color = 0xFFFFFF 
             int_addr = int(addr, 16)
-            int_call = dic_call[addr]
-            comm = str(int_call)
-            idc.MakeComm(int_addr, comm)
-            color = 0
-            if (int_call > 0 and int_call < 20):
-                color = 0xFFAFFF
+            if is_clean == 0:
+                int_call = dic_call[addr]
+                comm = str(int_call)
+                if (int_call > 0 and int_call < 20):
+                    color = 0xFFAFFF
+                #
+                elif (int_call >=20 and int_call < 40):
+                    color = 0xFF7FFF
+                else:
+                    color = 0xFF00FF
+                #
             #
-            elif (int_call >=20 and int_call < 40):
-                color = 0xFF7FFF
-            else:
-                color = 0xFF00FF
+            idc.MakeComm(int_addr, comm)
             idc.SetColor(int_addr, idc.CIC_ITEM, color)
         #
     #
