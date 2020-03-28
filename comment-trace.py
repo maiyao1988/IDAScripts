@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import sys
 import os.path
+#idaapi.split_sreg_range(instruction_pointer, idaapi.str2reg("T"), required_t_value, idaapi.SR_user)
 
 if __name__ == "__main__":
     trace_path = ""
@@ -16,7 +17,7 @@ if __name__ == "__main__":
     #
     is_clean=0
     if (in_ida):
-        trace_path = idc.AskStr("trace-jni.txt", "trace path")
+        trace_path = idc.AskFile(0, "*.*", "trace path")
         is_clean = idc.AskLong(0, "clean path?")
         if (not os.path.isabs(trace_path)):
             script_path = os.path.split(os.path.realpath(__file__))[0]
