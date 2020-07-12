@@ -1,4 +1,5 @@
-
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 
 import idaapi
 import idc
@@ -170,10 +171,16 @@ def starthook():
     if debughook:
         debughook.start_line_trace()
 
-
 def main():
     global debughook
+    #ida7 debug 中有bug,弹AskStr会卡死
+    #基本流程
+    #1.需要手动调整下面三个参数
     target1 = "libnative-lib.so"
+    start_off_in_target = 0x00004664
+    end_off_in_target = 0x00046DA
+    #2.需要在Debugger->Tracing->Tracing option 关闭Trace over debugger segments,并在这个页面输入Trace File路径
+    #脚本会在开始和结束下断点,点击continue运行.开始trace,命中结束断点trace自动结束,trace结果保存在设置的Trace File路径中
 
     unhook()
     skip_functions = []
@@ -190,9 +197,13 @@ def main():
                 if module_name == target1:
                     # module.size = 98304
                     modules_info.append({"base": module.base, "size": module.size, "name": module.name})
-                    start_ea = (module.base + 0x00004664)      #encode_func_2
-                    end_ea = [((module.base + 0x00046DA))]   
+                    start_ea = (module.base + start_off_in_target)      #encode_func_2
+                    end_ea = [((module.base + end_off_in_target))]   
                     break
+                #
+            #
+        #
+    #
     
     if start_ea:    # start address
         set_breakpoint(start_ea)
