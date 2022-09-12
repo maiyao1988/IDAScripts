@@ -59,7 +59,7 @@ class MyDbgHook(DBG_Hooks):
         self.skip_functions = skip_functions
         self.trace_step_into_count = 0
         self.trace_step_into_size = 1
-        self.trace_total_size = 300000
+        self.trace_total_size = 300000000
         self.trace_size = 0
         self.trace_lr = 0
         self.end_ea = end_ea
@@ -111,6 +111,8 @@ class MyDbgHook(DBG_Hooks):
         # return values:
         #   1  - do not log this trace event;
         #   0  - log it
+        lr = hex(my_get_reg_value("LR"))
+        print("%s  %s"%(hex(ea), lr))
         if self.line_trace:
             in_mine_so = False
             for module_info in self.modules_info:
@@ -119,32 +121,35 @@ class MyDbgHook(DBG_Hooks):
                 so_size = module_info["size"]
                 if so_base <= ea <= (so_base + so_size):
                     in_mine_so = True
-                    break
-
-            self.trace_size += 1
-            if (not in_mine_so) or (ea in self.skip_functions):
-                if (self.trace_lr != 0) and (self.trace_step_into_count < self.trace_step_into_size):
-                    self.trace_step_into_count += 1
                     return 0
+        
+        return 1
+        '''
+        self.trace_size += 1
+        if (not in_mine_so) or (ea in self.skip_functions):
+            if (self.trace_lr != 0) and (self.trace_step_into_count < self.trace_step_into_size):
+                self.trace_step_into_count += 1
+                return 0
 
-                if (self.trace_lr != 0) and (self.trace_step_into_count == self.trace_step_into_size):
-                    ida_dbg.enable_insn_trace(False)
-                    ida_dbg.enable_step_trace(False)
-                    ida_dbg.suspend_process()
-                    if self.trace_size > self.trace_total_size:
-                        self.trace_size = 0
-                        ida_dbg.request_clear_trace()
-                        ida_dbg.run_requests()
-
-                    ida_dbg.request_run_to(self.trace_lr & 0xFFFFFFFE)
+            if (self.trace_lr != 0) and (self.trace_step_into_count == self.trace_step_into_size):
+                ida_dbg.enable_insn_trace(False)
+                ida_dbg.enable_step_trace(False)
+                ida_dbg.suspend_process()
+                if self.trace_size > self.trace_total_size:
+                    self.trace_size = 0
+                    ida_dbg.request_clear_trace()
                     ida_dbg.run_requests()
-                    self.trace_lr = 0
-                    self.trace_step_into_count = 0
-                    return 0
 
-                if self.trace_lr == 0:
-                    self.trace_lr = my_get_reg_value("LR")
-            return 0
+                ida_dbg.request_run_to(self.trace_lr & 0xFFFFFFFE)
+                ida_dbg.run_requests()
+                self.trace_lr = 0
+                self.trace_step_into_count = 0
+                return 0
+
+            if self.trace_lr == 0:
+                self.trace_lr = my_get_reg_value("LR")
+        return 0
+        '''
 
     def dbg_run_to(self, pid, tid=0, ea=0):
         # print("dbg_run_to 0x%x pid=%d" % (ea, pid))
@@ -176,9 +181,9 @@ def main():
     #ida7 debug 中有bug,弹AskStr会卡死
     #基本流程
     #1.需要手动调整下面三个参数
-    target1 = "libnative-lib.so"
-    start_off_in_target = 0x00004664
-    end_off_in_target = 0x00046DA
+    target1 = "libcms.so"
+    start_off_in_target = 0x000643C8
+    end_off_in_target = 0x64580
     #2.需要在Debugger->Tracing->Tracing option 关闭Trace over debugger segments,并在这个页面输入Trace File路径
     #脚本会在开始和结束下断点,点击continue运行.开始trace,命中结束断点trace自动结束,trace结果保存在设置的Trace File路径中
 

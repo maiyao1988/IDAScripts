@@ -29,6 +29,7 @@ if __name__ == "__main__":
     soname = sys.argv[1]
     svc_arm = bytearray([00, 00, 00, 0xef])
     svc_thumb = bytearray([00, 0xdf])
+    svc_arm64_ios = bytearray([0x01,0x10,0x00,0xD4])
     with open(soname, "rb") as f:
         svcs_arm = find_bytes(f, svc_arm)
         print ("svc arm:")
@@ -37,6 +38,11 @@ if __name__ == "__main__":
         #
         print ("svc thumb:")
         svcs_thumb = find_bytes(f, svc_thumb)
+        for svc in svcs_thumb:
+            print(hex(svc))
+        #
+        print ("svc ios64:")
+        svcs_thumb = find_bytes(f, svc_arm64_ios)
         for svc in svcs_thumb:
             print(hex(svc))
         #
