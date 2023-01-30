@@ -15,9 +15,7 @@ import os
 
 debughook = None
 
-def set_breakpoint(ea, isthumb=1):
-    idc.SetReg(ea, "T", 1)
-    idc.MakeCode(ea)
+def set_breakpoint(ea):
     idc.add_bpt(ea)
 
 def my_get_reg_value(register):
@@ -181,9 +179,9 @@ def main():
     #ida7 debug 中有bug,弹AskStr会卡死
     #基本流程
     #1.需要手动调整下面三个参数
-    target1 = "libcms.so"
-    start_off_in_target = 0x000643C8
-    end_off_in_target = 0x64580
+    target1 = "libmetasec_ml.so"
+    start_off_in_target = 0x0004C028
+    end_off_in_target = 0x0004DDB4
     #2.需要在Debugger->Tracing->Tracing option 关闭Trace over debugger segments,并在这个页面输入Trace File路径
     #脚本会在开始和结束下断点,点击continue运行.开始trace,命中结束断点trace自动结束,trace结果保存在设置的Trace File路径中
 
@@ -203,7 +201,7 @@ def main():
                     # module.size = 98304
                     modules_info.append({"base": module.base, "size": module.size, "name": module.name})
                     start_ea = (module.base + start_off_in_target)      #encode_func_2
-                    end_ea = [((module.base + end_off_in_target))]   
+                    end_ea = [((module.base + end_off_in_target))]
                     break
                 #
             #
