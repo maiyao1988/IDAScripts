@@ -33,7 +33,7 @@ def is_modify_pc(addr):
 
 def is_jump(addr):
     mnem = GetMnem(addr)
-    if (mnem.startswith("B") and mnem not in ("BFC", "BFI", "BIC") or mnem.startswith("IT")):
+    if (mnem.startswith("B") and mnem not in ("BFC", "BFI", "BIC") or mnem.startswith("IT") or mnem.startswith("TBB")):
         return True
     #
     elif (is_modify_pc(addr)):
