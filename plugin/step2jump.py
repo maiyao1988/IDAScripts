@@ -15,7 +15,7 @@ def is_modify_pc(addr):
     if (opnd == "PC"):
         return True
     mnem = GetMnem(addr)
-    if (mnem.startswith("POP")):
+    if (mnem.startswith("POP") or mnem.startswith("LDMFD")):
         i = 0
         while True:
             opnd = GetOpnd(addr, i)
@@ -33,7 +33,7 @@ def is_modify_pc(addr):
 
 def is_jump(addr):
     mnem = GetMnem(addr)
-    if (mnem.startswith("B") and mnem not in ("BFC", "BFI", "BIC") or mnem.startswith("IT") or mnem.startswith("TBB")):
+    if (mnem.startswith("B") and mnem not in ("BFC", "BFI", "BIC") or mnem.startswith("IT") or mnem.startswith("CB") or mnem.startswith("TBB")):
         return True
     #
     elif (is_modify_pc(addr)):
@@ -80,7 +80,7 @@ class Step2Jump(idaapi.plugin_t):
                     #
                     if (is_jump(addr)):
                         ida_dbg.run_to(addr)
-                        print("run to break")
+                        print("run to jump")
                         break
                     #
                     addr = idc.next_head(addr)
